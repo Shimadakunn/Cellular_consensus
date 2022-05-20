@@ -27,19 +27,6 @@ static bool get_edge(struct graph_t *g, int i, int j)
   return g->mat[(min(i,j)*g->size)+max(i,j)];
 }
 
-/**
- * These are needed for the Floyd Warshall algorithm now
- */
-static void set_dist_mat(struct graph_t *g, int i, int j, unsigned int d)
-{
-  g->dist_mat[(min(i,j)*g->size)+max(i,j)] = d;
-}
-
-static unsigned int get_dist_mat(struct graph_t *g, int i, int j)
-{
-  return g->dist_mat[(min(i,j)*g->size)+max(i,j)];
-}
-
 
 struct graph_t* build_unconnected_graph(int num_vertices)
 {
@@ -99,99 +86,6 @@ unsigned int get_degree(struct graph_t *g, int node)
   for (int i = 0; i < g->size; i++)
   if(i!=node) d += !!get_edge(g, i, node);
   return d;
-}
-
-void floyd_warshall(struct graph_t *g)
-{
-  int i, j, k;
-  unsigned int new_dist;
-
-  // Initialise the distance matrix
-  #pragma omp parallel for private(i, j)
-  for (i = 0; i < g->size; i++)
-    for (j = i + 1; j < g->size; j++)
-      set_dist_mat(g, i, j, !!get_edge(g, i, j));
-
-  #pragma omp parallel for private(i, j, k, new_dist)
-  for (k = 0; k < g->size; k++)
-    for (i = 0; i < g->size; i++)
-      for (j = i + 1; j < g->size; j++)
-      {
-        if (i != j && get_dist_mat(g, i, k) && get_dist_mat(g, k, j))
-        {
-          new_dist = get_dist_mat(g, i, k) + get_dist_mat(g, k, j);
-          if (new_dist < get_dist_mat(g, i, j) || get_dist_mat(g, i, j) == 0)
-          {
-            set_dist_mat(g, i, j, new_dist); 
-          }
-        }
-      }
-}
-
-/**
- * Function to calculate average path length in graph according
- * to equations given in lecture slides.
- */
-double get_average_path_length(struct graph_t *g)
-{
-  floyd_warshall(g);
-  // Calculate total path length
-  unsigned int sum = 0;
-  for (int i = 0; i < g->size; i++)
-    for (int j = i + 1; j < g->size; j++) 
-      sum += get_dist_mat(g, i, j);
-
-  // Now make that an average
-  return 2.0 * (double) sum / (g->size * (g->size - 1));
-}
-
-int get_links_between_neighbours(struct graph_t *g, int node)
-{
-  int sum = 0;
-  for (int i = 0; i < g->size; i++)
-    // If i is a neighbour of node
-    if (get_edge(g, node, i))
-      // Check all possible links
-      for (int j = i + 1; j < g->size; j++)
-        // If edge is a neighbour of i, and also a neighbour of node
-        if (get_edge(g, i, j) && get_edge(g, node, j))
-          sum++;
-  return sum;
-}
-
-double get_global_clustering_coefficient(struct graph_t *g)
-{
-  double sum = 0;
-  // Average C over all nodes
-  for (int i = 0; i < g->size; i++)
-    sum += get_local_clustering_coefficient(g, i);
-  return sum / g->size;
-}
-
-double get_local_clustering_coefficient(struct graph_t *g, int node)
-{
-  // Named according to formula in lecture
-  int e = get_links_between_neighbours(g, node);
-  unsigned int k = get_degree(g, node);
-  return k > 1 ? 2 * (double) e / (k * (k-1)) : 0;
-}
-
-/**
- * Produces the degree distribution for the network.
- * Returns a malloced pointer so dont forget to free.
- */
-struct histogram_t* get_degree_distribution(struct graph_t *g)
-{
-  // Find max degree in network and set size
-  unsigned int max_degree = 0;
-  for (int i = 0; i < g->size; i++)
-    max_degree = max(max_degree, get_degree(g, i));
-
-  struct histogram_t *hist = create_empty_histogram(max_degree + 1);
-  // And now build the histogram
-  for (unsigned int i = 0; i < g->size; i++)
-    increment_bin(hist, get_degree(g, i));
-  return hist;
 }
 
 /**

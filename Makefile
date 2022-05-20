@@ -1,12 +1,6 @@
 CFLAGS := -Wall
 
-all: strogatz print_L_C_curve print_histogram
+all: strogatz
 
-strogatz: src/strogatz.c src/graph.c src/graph.h src/histogram.c src/histogram.h Makefile
-	gcc $(CFLAGS) -o $@ $(filter %.c,$^)
-
-print_L_C_curve: src/print_L_C_curve.c src/graph.c src/graph.h src/histogram.c src/histogram.h Makefile
-	gcc $(CFLAGS) -o $@ $(filter %.c,$^)
-
-print_histogram: src/print_histogram.c src/graph.c src/graph.h src/histogram.c src/histogram.h Makefile
+strogatz: src/main.c src/graph.c src/graph.h src/electeurs.c src/electeurs.h Makefile
 	gcc $(CFLAGS) -o $@ $(filter %.c,$^)
