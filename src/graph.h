@@ -12,8 +12,6 @@ struct graph_t {
   int edges_per_vertex;
 };
 
-bool get_edge(struct graph_t *g, int i, int j);
-
 struct graph_t* build_unconnected_graph(int num_vertices);
 struct graph_t* build_regular_graph(int num_vertices, int edges_per_vertex);
 double get_average_path_length(struct graph_t*);

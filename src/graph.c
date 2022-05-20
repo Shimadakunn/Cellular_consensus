@@ -22,7 +22,7 @@ static void set_edge(struct graph_t *g, int i, int j, bool connected)
  * Returns true if an edge is present between two vertices i & j, else false
  * Assumes the graph is undirected
  */
-bool get_edge(struct graph_t *g, int i, int j)
+static bool get_edge(struct graph_t *g, int i, int j)
 {
   return g->mat[(min(i,j)*g->size)+max(i,j)];
 }
@@ -40,9 +40,7 @@ static unsigned int get_dist_mat(struct graph_t *g, int i, int j)
   return g->dist_mat[(min(i,j)*g->size)+max(i,j)];
 }
 
-/**
- * Initialises an empty graph with no connections
- */
+
 struct graph_t* build_unconnected_graph(int num_vertices)
 {
   struct graph_t *g = (struct graph_t*) malloc(sizeof(struct graph_t));
@@ -55,9 +53,7 @@ struct graph_t* build_unconnected_graph(int num_vertices)
   return g;
 }
 
-/**
- * Builds a graph of any size with a ring topology
- */
+
 struct graph_t* build_regular_graph(int num_vertices, int edges_per_vertex)
 {
   struct graph_t* g = build_unconnected_graph(num_vertices);
@@ -75,34 +71,21 @@ struct graph_t* build_regular_graph(int num_vertices, int edges_per_vertex)
   return g;
 }
 
-/**
- * This does the Strogatz whatsit.
- * Takes a graph g, iterates over all arcs, and rewires connections
- * to random nodes with probability p
- */
+
 void randomise_graph(struct graph_t *g, float p)
 {
   int i, j, k, new;
-
-  // Seed random
   srand((unsigned)time(0));
-
   for (k = 1; k <= (g->edges_per_vertex >> 1); k++)
     for (i = 0; i < g->size; i++)
     {
       j = (i + k) % g->size;
-      // If random number < probability we swap nodes about, 
-      // Also, dont disconnect a node from the graph.
       if (get_edge(g, i, j) && (float)rand()/(float)RAND_MAX < p && get_degree(g, j) != 1 && get_degree(g, i) != g->size-1)
       {
-        // Disconnect nodes
         set_edge(g, i, j, false);
-        // Pick a new node
         do {
           new = (float)rand()/(float)RAND_MAX * g->size;
         }
-        // Want to make sure we create a new connection, and it isn't
-        // a self loop
         while (new == j || new == i || get_edge(g, i, new));
           set_edge(g, i, new, true);
       }

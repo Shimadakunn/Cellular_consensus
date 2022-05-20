@@ -6,11 +6,28 @@
 #include <string.h>
 #include <assert.h>
 
-void init_opinion(struct graph_t* g) //set random opinion for each node
+const int DECISION = 4;
+int *tab_opinions;
+
+static bool get_edge(struct graph_t * g, int i, int j){
+    return g->mat[i*g->size+j];
+}
+
+void init_opinion(struct graph_t* g, float p0) //set random opinion for each node
 {
+    tab_opinions = (int*)calloc((size_t)g->size, sizeof(int));
     srand((unsigned)time(0));
+    p0 = p0*10;
     for(int i=0; i < g->size; i++){
-        g->mat[i*g->size+i] = rand()%2;
+        int x = rand()%11;
+        if(x > p0) {
+            g->mat[i*g->size+i] = 0;
+            tab_opinions[i] = -1;
+        }
+        else if(x <= p0) {
+            g->mat[i*g->size+i] = 1;
+            tab_opinions[i] = 1;
+        }
     }
 }
 
@@ -18,29 +35,36 @@ bool get_opinion(struct graph_t* g, int k){
     return g->mat[k*g->size+k];
 }
 
-int cellular_consensus(struct graph_t* g, int k){
-    float opinion_0 = 0;
-    float opinion_1 = 0;
-    float degree = ((float)get_degree(g,k)) / 2;
-    for(int i=k+1; i < g->size; i++){
-        if(get_edge(g,i,k) && g->mat[i*g->size+i] == 0 ){
-            opinion_0 ++ ;
-        }
-        else if(get_edge(g,i,k) && g->mat[i*g->size+i] == 1){
-            opinion_1 ++ ;
-        }
-    }
+void cellular_consensus(struct graph_t* g){
+    
+    for(int k=0; k < g->size; k++){ //itere le nombre de noeuds
+        int opinion_0 = 0; //somme des opinions valant 0
+        int opinion_1 = 0; //somme des opinions valant 1
+        int degree = get_degree(g,k) / 2; //nbr de voisins / 2
 
-    if(opinion_0 > degree) return 0;
-    else if(opinion_1 > degree) return 1;
-    else return -1;
+        if(tab_opinions[k] > DECISION || tab_opinions[k] < -DECISION) g->mat[k*g->size+k] = g->mat[k*g->size+k]; //cas ou decidé
+
+        for(int i=0; i < g->size; i++){ //parcours ses voisins
+            if(get_edge(g,i,k) && g->mat[i*g->size+i] == 0){ //si l'opinion du voisin est 0
+                opinion_0 ++ ;
+            }
+            else if(get_edge(g,i,k) && g->mat[i*g->size+i] == 1){ //si l'opinion du voisin est 1
+                opinion_1 ++ ;
+            }
+        }
+
+        if(opinion_0 > degree){
+            g->mat[k*g->size+k] = 0;
+            tab_opinions[k] = tab_opinions[k] - 1;
+        }
+        else if(opinion_1 > degree){
+            g->mat[k*g->size+k] = 1;
+            tab_opinions[k] = tab_opinions[k] + 1;
+        }
+        else g->mat[k*g->size+k] = g->mat[k*g->size+k];
+    } 
 }
 
-void next_step(struct graph_t* g){
-    for(int i=0; i < g->size; i++){
-        // printf("Index: %d opinion: %d ", i, g->mat[i*g->size+i]);
-        if(cellular_consensus(g,i) == 0) g->mat[i*g->size+i] = 0;
-        else if(cellular_consensus(g,i) == 1) g->mat[i*g->size+i] = 1;
-        // printf("voisin opinion: %d opinion n+1: %d \n", cellular_consensus(g,i), g->mat[i*g->size+i]);
-    }
+void delete_tab_opinions(){
+    free(tab_opinions);
 }

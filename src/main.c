@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <windows.h>
 #include "graph.h"
 #include "electeurs.h"
 
@@ -13,9 +15,11 @@ static void print_usage(FILE *f)
 
 int main(int argc, char** argv)
 {
-  int num_vertices, edges_per_vertex;
-  float prob_of_swap;
+  int num_vertices, edges_per_vertex, iterations;
+  float prob_of_swap, p0;
   struct graph_t *g;
+  FILE *fptr;
+  fptr = fopen("./graph.dot","w");
 
   if (argc < 4)
     goto err_usage;
@@ -24,6 +28,10 @@ int main(int argc, char** argv)
   if (sscanf(argv[2], "%i", &edges_per_vertex) != 1)
     goto err_usage;
   if (sscanf(argv[3], "%f", &prob_of_swap) != 1)
+    goto err_usage;
+  if (sscanf(argv[4], "%i", &iterations) != 1)
+    goto err_usage;
+  if (sscanf(argv[5], "%f", &p0) != 1)
     goto err_usage;
 
   if (edges_per_vertex % 2) {
@@ -34,28 +42,18 @@ int main(int argc, char** argv)
   g = build_regular_graph(num_vertices, edges_per_vertex);
   randomise_graph(g, prob_of_swap);
 
-  init_opinion(g);
-  printf("\n === Apres initialisation de l'opinion ===\n");
-  for(int i = 0; i < num_vertices*num_vertices; i++){
-        printf("%d ", g->mat[i]);
-        if(i%num_vertices == num_vertices-1) printf("\n");
-  }
+  init_opinion(g,p0);
 
-  printf("\n === Opinion === \n");
-  for(int i = 0; i < num_vertices; i++){
-    printf("%d: %d || ", i, g->mat[i*g->size+i]);
+  for (int i = 0; i < iterations; i++){
+    cellular_consensus(g);
   }
-
-  for(int i = 0; i < 10000; i++){
-      next_step(g);
-  }
-
-  print_graph(stderr, g);
+  print_graph(fptr,g);
   
+  delete_tab_opinions();
   delete_graph(g);
   return 0;
 
 err_usage:
-  
+  print_usage(stdout);
   return EXIT_FAILURE;
 }
