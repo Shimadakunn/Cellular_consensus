@@ -17,10 +17,9 @@ int main(int argc, char** argv)
   int num_vertices, edges_per_vertex;
   float prob_of_swap, prob0, p_byz, p_lie;
   struct graph_t *g;
-  FILE *fptr1, *fptr2, *fptr3;
+  FILE *fptr1, *fptr2;
   fptr1 = fopen("./graphs/graph1.dot","w");
   fptr2 = fopen("./graphs/graph2.dot","w");
-  fptr3 = fopen("./graphs/graph3.dot","w");
 
   if (argc < 4)
     goto err_usage;
@@ -48,10 +47,7 @@ int main(int argc, char** argv)
   init_opinion(g,prob0);
   set_byzantins(g,p_byz);
 
-  
-
   print_graph(fptr1,g);
-
 
   int i = 0;
   float sum = 0.5;
@@ -67,8 +63,6 @@ int main(int argc, char** argv)
 
   print_graph(fptr2,g);
 
-
-  
   delete_tab_opinions();
   delete_tab_byzantins();
   delete_graph(g);
