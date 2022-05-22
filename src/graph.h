@@ -22,6 +22,8 @@ struct graph_t {
   int edges_per_vertex;
 };
 
+
+
 struct graph_t* build_unconnected_graph(int num_vertices);
 struct graph_t* build_regular_graph(int num_vertices, int edges_per_vertex);
 void randomise_graph(struct graph_t*, float);

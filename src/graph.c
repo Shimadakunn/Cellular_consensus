@@ -7,6 +7,8 @@
 #include <string.h>
 #include <assert.h>
 
+
+
 /**
  * Sets whether an edge is present between two vertices i & j
  * Assumes the graph is undirected
@@ -129,14 +131,19 @@ void print_graph(FILE* f, struct graph_t* g)
     char *color;
     if(get_opinion(g,i) == false) color = color_0;
     else if(get_opinion(g,i) == true) color = color_1;
+    char *honest = "circle";
+    char *malicious = "doublecircle";
+    char *shape;
+    if(get_byzantin(i) == 0) shape = honest;
+    else if(get_byzantin(i) == 1) shape = malicious;
     fprintf(f, "%s [label=\"%d\","
         "pos=\"%f,%f!\","
-        "shape=circle,"
+        "shape=\"%s\","
         "width=1.,"
         "fixedsize=true," 
         "style=filled,"
-        "fillcolor=\"%s\"\n]\n",
-        label, i, x, y, color);
+        "fillcolor=\"%s\"]\n",
+        label, i, x, y, shape, color);
   }
   // Print all arcs
   for (int i = 0; i < g->size; i++)

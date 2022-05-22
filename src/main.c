@@ -14,8 +14,8 @@ static void print_usage(FILE *f)
 
 int main(int argc, char** argv)
 {
-  int num_vertices, edges_per_vertex, iterations;
-  float prob_of_swap, p0;
+  int num_vertices, edges_per_vertex;
+  float prob_of_swap, prob0, p_byz, p_lie;
   struct graph_t *g;
   FILE *fptr1, *fptr2, *fptr3;
   fptr1 = fopen("./graphs/graph1.dot","w");
@@ -30,7 +30,11 @@ int main(int argc, char** argv)
     goto err_usage;
   if (sscanf(argv[3], "%f", &prob_of_swap) != 1)
     goto err_usage;
-  if (sscanf(argv[4], "%f", &p0) != 1)
+  if (sscanf(argv[4], "%f", &prob0) != 1)
+    goto err_usage;
+  if (sscanf(argv[5], "%f", &p_byz) != 1)
+    goto err_usage;
+  if (sscanf(argv[6], "%f", &p_lie) != 1)
     goto err_usage;
 
   if (edges_per_vertex % 2) {
@@ -41,9 +45,13 @@ int main(int argc, char** argv)
   g = build_regular_graph(num_vertices, edges_per_vertex);
   randomise_graph(g, prob_of_swap);
 
-  init_opinion(g,p0); 
+  init_opinion(g,prob0);
+  set_byzantins(g,p_byz);
+
+  
 
   print_graph(fptr1,g);
+
 
   int i = 0;
   float sum = 0.5;
@@ -51,15 +59,18 @@ int main(int argc, char** argv)
   while(sum!= 0 && sum!=1){
     sum = 0;
     i++;
-    cellular_consensus(g);
+    cellular_consensus(g,p_lie);
     for(int j = 0; j < g->size; j++) sum = sum + g->mat[j*g->size + j];
     sum = sum / g->size;
     printf("i = %d, sum = %f\n",i,sum);
   }
 
   print_graph(fptr2,g);
+
+
   
   delete_tab_opinions();
+  delete_tab_byzantins();
   delete_graph(g);
   return 0;
 
