@@ -1,7 +1,7 @@
 Watts-Strogatz Topology and Cellular Consensus
 ========
 
-Implementation of Watts and Strogatz&#39;s algorithm for network rewiring and Cellular Automata Consensus algorithm
+Implementation of Watts and Strogatz&#39;s algorithm for network rewiring and Cellular Automata Consensus algorithm.
 
 The binary is built by typing "make".
 
@@ -10,7 +10,7 @@ strogatz:
 
 strogatz takes four arguments, the graph size (N), the number of edges per node in the original graph (K), and the probability of swapping (p) and probability of initial opinion (prob0).
 
-You can add byzantin nodes which will interfere with the convergence by adding two more arguments, the probabilty of node becoming byzantin (p_byz) and the probability of those nodes lying (p_lie).
+You can add byzantin nodes which will interfere with the convergence of the opinion by adding two more arguments, the probabilty of node becoming byzantin (p_byz) and the probability of those nodes lying (p_lie).
 
 The binary then prints out the graph in .dot format to stderr, so running
 
