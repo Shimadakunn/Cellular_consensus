@@ -3,6 +3,8 @@ Watts-Strogatz Topology and Cellular Consensus
 
 Implementation of Watts and Strogatz&#39;s algorithm for network rewiring and Cellular Automata Consensus algorithm.
 
+### This simulation goal is to study under which conditions interconnected nodes can agree on an opinion in the presence of malicious nodes.
+
 The binary is built by typing "make".
 
 strogatz:
@@ -22,3 +24,9 @@ Then you will see in the folder ./graphs, the visualisation of the evolution of 
 
 =========
 It's an implementation based on this GitHub repository: https://github.com/andrewrch/strogatz
+
+## The graph opinion before the consensus
+![image](https://user-images.githubusercontent.com/89693356/231459205-3b678b40-cf92-4507-9f68-26f08eb948ba.png)
+
+## The graph opinion after the consensus
+![image](https://user-images.githubusercontent.com/89693356/231459464-8e478725-e78b-46f0-b4ff-72ef6117fe82.png)
