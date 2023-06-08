@@ -26,6 +26,8 @@ Then you will see in the folder ./graphs, the visualisation of the evolution of 
 It's an implementation based on this GitHub repository: https://github.com/andrewrch/strogatz
 
 ## The graph opinion before the consensus
+Cercles represents nodes, double cercles represents malicious nodes, colors represents opinions and link represents communications
+
 ![image](https://user-images.githubusercontent.com/89693356/231459205-3b678b40-cf92-4507-9f68-26f08eb948ba.png)
 
 ## The graph opinion after the consensus
